@@ -1,6 +1,10 @@
 function validateBody(schema) {
   return (req, res, next) => {
-    return schema.validate(req.body);
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return next(error);
+    }
+    next();
   };
 }
 
