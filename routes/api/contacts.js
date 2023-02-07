@@ -28,19 +28,9 @@ router.get("/:contactId", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
-  const { error } = await validateBody(contactSchema);
+router.post("/", validateBody(contactSchema), async (req, res, next) => {
   try {
-    if (error)
-      return res.status(400).json({ message: error.details[0].message });
-
-    // const { name, email, phone } = req.body;
-
-    // if (!name || !email || !phone)
-    //   return res.status(400).json({ message: "missing required name field" });
-
     const newContact = await Contact.create(req.body);
-
     return res.status(201).json(newContact);
   } catch (error) {
     next(error);
@@ -62,37 +52,28 @@ router.delete("/:contactId", async (req, res, next) => {
   }
 });
 
-router.put("/:contactId", async (req, res, next) => {
-  const { error } = await validateBody(contactSchema);
-  try {
-    if (error)
-      return res.status(400).json({ message: error.details[0].message });
+router.put(
+  "/:contactId",
+  validateBody(contactSchema),
+  async (req, res, next) => {
+    try {
+      const response = await Contact.findByIdAndUpdate(
+        req.params.contactId,
+        req.body
+      );
 
-    // const { name, email, phone } = req.body;
-
-    // if (!name && !email && !phone)
-    //   return res.status(400).json({ message: "missing fields" });
-
-    const response = await Contact.findByIdAndUpdate(
-      req.params.contactId,
-      req.body
-    );
-
-    if (response) return res.json(response);
-    return res.status(404).json({
-      message: `Contact with id=${req.params.contactId} not found!`,
-    });
-  } catch (error) {
-    next(error);
+      if (response) return res.json(response);
+      return res.status(404).json({
+        message: `Contact with id=${req.params.contactId} not found!`,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.patch("/:contactId/favorite", async (req, res, next) => {
-  const { error } = await validateBody(contactSchema);
   try {
-    if (error)
-      return res.status(400).json({ message: error.details[0].message });
-
     const { favorite } = req.body;
 
     if (!favorite)
