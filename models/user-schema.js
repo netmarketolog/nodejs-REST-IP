@@ -18,6 +18,10 @@ const schema = mongoose.Schema(
       enum: ["starter", "pro", "business"],
       default: "starter",
     },
+    avatarURL: {
+      type: String,
+      default: null,
+    },
     token: {
       type: String,
       default: null,
