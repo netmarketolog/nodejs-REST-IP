@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user-schema");
 const { Unauthorized } = require("http-errors");
+const multer = require("multer");
+const path = require("path");
 
 function HttpError(status, message) {
   const err = new Error(message);
@@ -45,10 +47,25 @@ async function auth(req, res, next) {
     }
     throw error;
   }
+  next();
 }
+
+const storage = multer.diskStorage({
+  dest: function (req, file, cb) {
+    cb(null, path.resolve(__dirname, "../tmp"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Math.round(Math.random() * 100) + file.originalname);
+  },
+});
+
+const upload = multer({
+  storage,
+});
 
 module.exports = {
   validateBody,
   auth,
   HttpError,
+  upload,
 };
