@@ -1,20 +1,14 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user-schema");
-const { Unauthorized } = require("http-errors");
+const { Unauthorized, BadRequest } = require("http-errors");
 const multer = require("multer");
 const path = require("path");
-
-function HttpError(status, message) {
-  const err = new Error(message);
-  err.status = status;
-  return err;
-}
 
 function validateBody(schema) {
   return (req, res, next) => {
     const { error } = schema.validate(req.body);
     if (error) {
-      return next(HttpError(400, error.message));
+      return next(BadRequest(error.message));
     }
     next();
   };
@@ -66,6 +60,5 @@ const upload = multer({
 module.exports = {
   validateBody,
   auth,
-  HttpError,
   upload,
 };
