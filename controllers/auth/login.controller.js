@@ -14,6 +14,10 @@ async function login(req, res, next) {
     throw Unauthorized("Email or password is wrong");
   }
 
+  if (!storedUser.verify) {
+    throw Unauthorized("Email is not verified. Please check your mail box");
+  }
+
   const isPasswordValid = await bcrypt.compare(password, storedUser.password);
 
   if (!isPasswordValid) {
