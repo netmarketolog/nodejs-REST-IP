@@ -4,6 +4,8 @@ const { Unauthorized, BadRequest } = require("http-errors");
 const multer = require("multer");
 const path = require("path");
 
+const nodemailer = require("nodemailer");
+
 function validateBody(schema) {
   return (req, res, next) => {
     const { error } = schema.validate(req.body);
@@ -57,8 +59,29 @@ const upload = multer({
   storage,
 });
 
+async function sendMail({ to, html, subject }) {
+  const email = {
+    from: "info@mycontacts.com",
+    to,
+    subject,
+    html,
+  };
+
+  const transport = nodemailer.createTransport({
+    host: "smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transport.sendMail(email);
+}
+
 module.exports = {
   validateBody,
   auth,
   upload,
+  sendMail,
 };
